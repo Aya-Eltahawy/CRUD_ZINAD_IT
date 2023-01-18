@@ -1,0 +1,148 @@
+<div style="background:orange ; height:2px; margin-bottom: 10px;"></div>
+<div class="container " style="margin-top:2%">
+  <div class="row">
+    <div *ngIf="status==0" class="alert alert-danger alert-dismissible fade show col-sm-12 " style="text-align: center;"
+      role="alert">
+      An Error has occurred
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <div *ngIf="status==1" class="alert alert-success alert-dismissible fade show col-sm-12 "
+      style="text-align: center;" role="alert">
+      Changes added successfuly
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  </div>
+  <div class="row pb-4">
+    <h1 class="text-muted font-weight-light">News</h1>
+  </div>
+  <section class="container bg-white rounded " style="padding-right: 3rem; padding-left:3rem">
+    <div class="row pt-5">
+      <div class="col-lg-10">
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" (click)="toggleLanguage($event.target)" name="inlineRadioOptions"
+            id="inlineRadio1" value="en">
+          <label class="form-check-label" for="inlineRadio1">English</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" (click)="toggleLanguage($event.target)" name="inlineRadioOptions"
+            id="inlineRadio2" value="ar">
+          <label class="form-check-label" for="inlineRadio2">Arabic</label>
+        </div>
+
+      </div>
+      <div class="col-xxl-2">
+        <button class="btn btn-primary" style="margin-right:10px; font-size: .95rem;" (click)="refresh()">
+          <li class="fa-solid fa-refresh"></li> Refresh
+        </button>
+        <!-- Button trigger modal -->
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop"
+          (click)="resetModal()">
+          <li class="fa-solid fa-plus"> </li> Add
+        </button>
+      </div>
+
+      <!-- Modal -->
+      <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="staticBackdropLabel">Enter Data</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+
+              <form [formGroup]="PostData" (submit)="modalHandler()">
+                <div class="form-group">
+                  <label class="col-sm-3 control-label" for="title_en">Title EN</label>
+                  <input class="form-control" type="text" formControlName="title_en" placeholder="Title in English"
+                    id="title_en" name="title_en">
+                </div>
+                <div class="form-group">
+                  <label class="col-sm-3 control-label" for="title_ar">Title AR</label>
+                  <input class="form-control" type="text" formControlName="title_ar" placeholder="Title in Arabic"
+                    id="title_ar" name="title_ar">
+                </div>
+                <div class="form-group">
+                  <label class="col-sm-3 control-label" for="content">Content EN</label>
+                  <textarea class="form-control" id="content_en" formControlName="content_en" name="content_en"
+                    placeholder="Content in English" rows="5"></textarea>
+                </div>
+                <div class="form-group">
+                  <label class="col-sm-3 control-label" for="content_ar">Content AR</label>
+                  <textarea class="form-control" id="content_ar" formControlName="content_ar" name="content_ar"
+                    placeholder="Content in Arabic" rows="5"></textarea>
+                </div>
+                <p [ngClass]="{'d-none':!PostData.invalid|| !PostData.touched}"
+                  class="alert alert-danger w-100 mx-auto col-5 mt-4" role="alert">
+                  All Fields are required please make sure the input length is at least 3 characters.
+                </p>
+                <div class="modal-footer">
+                  <button type="submit" class="btn btn-primary"><i
+                      class="fas fa-circle-check "></i> Save</button>
+                  <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="fa-solid fa-ban"
+                      style="color:white"></i> Cancel</button>
+
+                </div>
+              </form>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!--confirmation message modal-->
+    <div class="modal" id="deleteDialog" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Delete confirmation</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>Are you sure that you wanna delete this post?</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-danger" (click)="DeletePost(postId)" data-bs-dismiss="modal" >Delete</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+
+
+    <table class="table table-striped " style="border-bottom: 5px solid #f8f9fa">
+      <thead>
+        <tr class="border-bottom border-dark">
+          <th scope="col" style="width:30%">Title</th>
+          <th scope="col" style="width:35%">Content</th>
+          <th scope="col">Date</th>
+          <th scope="col">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let data of AllPostsArray; let i=index">
+          <td style="width:30%">
+            {{ data.title }}
+          </td>
+          <td style="width:35%">{{ data.content }}</td>
+          <td>{{ data.created_at }}</td>
+          <td><button (click)="postId=data.id" data-bs-toggle="modal" data-bs-target="#deleteDialog"
+              style="border:none;background-color: transparent;"><i class="fa fa-trash-o m-1 "
+                style="color:rgb(241, 207, 69);" aria-hidden="true"></i></button>
+      
+            <button data-bs-toggle="modal" data-bs-target="#staticBackdrop" (click)="FetchPost(data.id)"
+              style="border:none;background-color: transparent;"><i
+                class="fa-solid fa-pen-to-square text-primary"></i></button>
+          </td>
+
+        </tr>
+      </tbody>
+    </table>
+  </section>
+</div>
